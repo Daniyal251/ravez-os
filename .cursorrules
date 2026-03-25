@@ -1,0 +1,82 @@
+# RAVEZ OS — Cursor Rules
+
+You are building RAVEZ OS, a nightclub management system (React + Vite + Tailwind).
+
+## Architecture
+- Frontend: React 18 + Vite + Tailwind CSS + React Router
+- Backend: PHP REST API at https://ravez-one.ru/backend/api.php (already exists, do NOT modify)
+- Auth: JWT tokens stored in localStorage as `staff_token`
+- API calls go through `src/api/client.js` — always use `api.get()` and `api.post()`
+
+## Project structure
+```
+src/
+  api/client.js          — API client (fetch wrapper)
+  hooks/useAuth.js       — Auth context & hook
+  components/            — Reusable UI components
+    Layout.jsx           — Main layout (sidebar + content)
+    Sidebar.jsx          — Navigation sidebar
+    MobileNav.jsx        — Bottom nav for mobile
+    ProtectedRoute.jsx   — Auth guard
+  pages/                 — One file per page/module
+    Login.jsx
+    Dashboard.jsx
+    Tasks.jsx
+    Events.jsx
+    Team.jsx
+    ...
+  utils/constants.js     — Roles, statuses, config
+```
+
+## Coding rules
+- Language: Russian UI labels, English code (variable names, comments)
+- Use functional components with hooks
+- Use Tailwind classes, NO inline styles, NO CSS files per component
+- Use lucide-react for icons
+- Use recharts for charts
+- Each page is a single file, max 200 lines. If bigger — extract components
+- API calls: always handle loading and error states
+- Mobile-first: design for 375px, scale up to desktop
+
+## API conventions
+- Base URL: configured in `src/api/client.js`
+- Auth header: `X-Staff-Token: <token>`
+- GET: `api.get('staff/list')` → calls `/backend/api.php?a=staff/list`
+- POST: `api.post('task/save', { title, ... })` → POST with JSON body
+- Response format: `{ ok: true, data: ... }` or `{ error: "message" }`
+
+## Available API endpoints (main ones)
+- `staff/login` POST { login, password } → { token, staff }
+- `staff/me` GET → { staff: { id, name, role, ... } }
+- `staff/list` GET → { staff: [...] }
+- `tasks/list` GET → { tasks: [...] }
+- `task/save` POST { title, description, status, assigned_to, deadline }
+- `events/list` GET → { events: [...] }
+- `event/save` POST { title, date, time_start, time_end, status }
+- `shifts/list` GET → { shifts: [...] }
+- `shift/save` POST { staff_id, date, time_start, time_end }
+- `finances/list` GET → { finances: [...] }
+- `finance/save` POST { type, amount, category, description, date }
+- `guests/list` GET → { guests: [...] }
+- `salary/list` GET → { salaries: [...] }
+- `loyalty/tiers` GET → { tiers: [...] }
+- `integrations/list` GET → { integrations: [...] }
+- `analytics/dashboard` GET → { stats: { ... } }
+
+## Design system
+- Colors: brand-400 (#00e6c8) = primary accent, surface-50..900 = grays
+- Font: DM Sans for body, Bebas Neue for display headings
+- Border radius: rounded-lg (cards), rounded-md (buttons, inputs)
+- Spacing: p-4/p-6 for cards, gap-4 for grids
+- States: bg-emerald-50 text-emerald-700 (success), bg-amber-50 text-amber-700 (warning), bg-red-50 text-red-700 (danger)
+
+## Roles (18 total, main ones)
+owner, director, dev_director, admin, art_director, smm, designer,
+stories_maker, light_tech, ambassador_manager, ambassador, promoter,
+hostess, security, bartender, accountant, dj, hq
+
+## When creating a new page
+1. Create file in src/pages/
+2. Add route in App.jsx
+3. Add sidebar item in Sidebar.jsx
+4. Follow the pattern from Dashboard.jsx

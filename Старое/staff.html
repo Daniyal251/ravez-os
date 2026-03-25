@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>RAVEZ — Staff</title>
+<!-- PWA отключён до стабильной версии -->
+<!-- <link rel="manifest" href="manifest.json"> -->
+<!-- <meta name="theme-color" content="#07070f"> -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ── ROOT ── */
+:root{
+  --bg:#07070f;--bg2:#0d0d1a;--bg3:#111120;
+  --cy:#00e6c8;--cy2:#00c4ab;
+  --w:#fff;--gl:#9898b8;--g:#52526e;
+  --cb:rgba(255,255,255,.08);--r:12px;
+  --fd:'Bebas Neue',sans-serif;
+  --fb:'Outfit',sans-serif;
+  --fm:'JetBrains Mono',monospace;
+  --nav-h:56px;--bnav-h:64px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--w);font-family:var(--fb);min-height:100vh;-webkit-tap-highlight-color:transparent}
+input,select,textarea,button{font-family:var(--fb);font-size:.85rem}
+input[type=text],input[type=password],input[type=tel],input[type=email],input[type=number],input[type=date],select,textarea{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid var(--cb);
+  color:var(--w);padding:.7rem .9rem;border-radius:8px;outline:none;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--cy)}
+select option{background:#1a1a2e;color:var(--w)}
+.hidden{display:none!important}
+
+/* ── BUTTONS ── */
+.btn{background:var(--cy);color:var(--bg);border:none;padding:.7rem 1.2rem;border-radius:8px;font-weight:700;font-size:.8rem;cursor:pointer;transition:background .2s}
+.btn:hover{background:var(--cy2)}.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-sm{background:var(--cy);color:var(--bg);border:none;padding:.35rem .75rem;border-radius:6px;font-size:.72rem;font-weight:600;cursor:pointer}
+.btn-sm:hover{background:var(--cy2)}
+.btn-xs{background:rgba(255,255,255,.08);color:var(--w);border:none;padding:.25rem .55rem;border-radius:5px;font-size:.65rem;cursor:pointer}
+.btn-xs:hover{background:rgba(255,255,255,.15)}
+.btn-cy{background:var(--cy);color:var(--bg);border:none;padding:.5rem 1rem;border-radius:8px;font-size:.75rem;font-weight:600;cursor:pointer}
+.btn-cy:hover{background:var(--cy2)}
+.btn-out{background:transparent;border:1px solid var(--cb);color:var(--gl);padding:.5rem 1rem;border-radius:8px;font-size:.75rem;cursor:pointer}
+.btn-out:hover{border-color:var(--cy);color:var(--cy)}
+.btn-red,.btn-danger{background:rgba(255,80,80,.15);border:1px solid rgba(255,80,80,.3);color:#ff5252;padding:.4rem .8rem;border-radius:6px;font-size:.72rem;cursor:pointer}
+.btn-red:hover,.btn-danger:hover{background:rgba(255,80,80,.25)}
+
+/* ── LOGIN SCREEN ── */
+#login-screen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:1.5rem 1rem;background:var(--bg);
+}
+.login-inner{width:100%;max-width:360px;display:flex;flex-direction:column;gap:1rem}
+.login-logo{text-align:center;font-family:var(--fd);font-size:2.2rem;letter-spacing:.12em}
+.login-logo span{color:var(--cy)}
+.login-sub{text-align:center;font-size:.6rem;color:var(--gl);letter-spacing:.2em;text-transform:uppercase;margin-top:-.5rem}
+.login-box,.register-box{background:var(--bg2);border:1px solid var(--cb);border-radius:var(--r);padding:1.5rem}
+.login-box h2,.register-box h2{font-size:.8rem;color:var(--gl);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.1em}
+.ig{margin-bottom:.85rem}
+.ig label{display:block;font-size:.6rem;color:var(--gl);font-family:var(--fm);margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.05em}
+.err{color:#ff5252;font-size:.65rem;margin-top:.5rem;display:none}
+.ok-msg{color:var(--cy);font-size:.65rem;margin-top:.5rem;display:none}
+.login-links{font-size:.65rem;color:var(--gl);text-align:center;margin-top:.75rem}
+.login-links a{color:var(--cy);text-decoration:none;cursor:pointer}
+
+/* ── NAV ── */
+.top-nav{
+  background:var(--bg2);border-bottom:1px solid var(--cb);
+  height:var(--nav-h);display:flex;align-items:center;
+  padding:0 1rem;position:sticky;top:0;z-index:100;gap:.75rem;
+}
+.top-nav .logo{font-family:var(--fd);font-size:1.2rem;letter-spacing:.1em;white-space:nowrap}
+.top-nav .logo span{color:var(--cy)}
+.tabs-scroll{flex:1;overflow-x:auto;display:flex;gap:.25rem;scrollbar-width:none}
+.tabs-scroll::-webkit-scrollbar{display:none}
+.tab-btn{
+  background:transparent;border:none;color:var(--gl);
+  padding:.4rem .7rem;border-radius:6px;font-size:.7rem;white-space:nowrap;cursor:pointer;
+  transition:background .15s,color .15s;flex-shrink:0;
+}
+.tab-btn:hover{background:rgba(255,255,255,.06);color:var(--w)}
+.tab-btn.active{background:rgba(0,230,200,.12);color:var(--cy);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+#nav-name{font-size:.65rem;color:var(--gl);font-family:var(--fm);white-space:nowrap}
+.rb{padding:.15rem .4rem;border-radius:4px;font-size:.55rem;font-weight:700;font-family:var(--fm);text-transform:uppercase}
+.r-hq,.r-owner{background:#ffd70022;color:#ffd700}
+.r-director,.r-dev_director,.r-art_director{background:rgba(0,230,200,.15);color:var(--cy)}
+.r-admin{background:rgba(120,100,255,.2);color:#a78bfa}
+.r-accountant{background:rgba(74,222,128,.15);color:#4ade80}
+.r-dj,.r-smm,.r-designer,.r-stories_maker,.r-light_tech{background:rgba(255,255,255,.08);color:#ccc}
+.r-hostess,.r-ambassador,.r-ambassador_manager{background:rgba(251,146,60,.15);color:#fb923c}
+.r-bartender,.r-security,.r-promoter{background:rgba(148,163,184,.1);color:#94a3b8}
+#notif-count{
+  background:#ff5252;color:#fff;border-radius:99px;
+  font-size:.55rem;padding:.1rem .35rem;font-weight:700;font-family:var(--fm);
+  display:none;
+}
+.logout-btn{background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.25);color:#ff5252;padding:.35rem .7rem;border-radius:6px;font-size:.6rem;cursor:pointer;white-space:nowrap}
+
+/* ── CONTENT ── */
+#staff-main{
+  max-width:1100px;margin:0 auto;
+  padding:1.5rem 1rem calc(var(--bnav-h) + 1.5rem);
+  min-height:calc(100vh - var(--nav-h));
+}
+.panel-title{font-family:var(--fd);font-size:1.5rem;letter-spacing:.06em;margin-bottom:1.25rem;display:flex;align-items:center;gap:.75rem}
+
+/* ── BOTTOM NAV (mobile) ── */
+#bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--bg2);border-top:1px solid var(--cb);
+  height:var(--bnav-h);display:flex;z-index:100;
+}
+.bnav-btn{
+  flex:1;background:transparent;border:none;color:var(--gl);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:.15rem;font-size:.55rem;cursor:pointer;transition:color .15s;padding:.25rem 0;
+}
+.bnav-btn span:first-child{font-size:1.1rem}
+.bnav-btn.active,.bnav-btn:hover{color:var(--cy)}
+
+/* ── CARDS / TABLES ── */
+.card{background:var(--bg2);border:1px solid var(--cb);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem}
+.card-title{font-size:.65rem;color:var(--gl);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem;margin-bottom:1.25rem}
+.stat-card{background:rgba(255,255,255,.02);border:1px solid var(--cb);border-radius:var(--r);padding:1.1rem;text-align:center}
+.stat-val{font-family:var(--fd);font-size:2rem;color:var(--cy)}
+.stat-lbl{font-size:.55rem;color:var(--gl);text-transform:uppercase;letter-spacing:.1em;margin-top:.4rem}
+.data-table{width:100%;border-collapse:collapse;font-size:.75rem}
+.data-table th{color:var(--gl);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;padding:.5rem .75rem;border-bottom:1px solid var(--cb);text-align:left;white-space:nowrap}
+.data-table td{padding:.6rem .75rem;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+.data-table tr:hover td{background:rgba(255,255,255,.02)}
+.empty{text-align:center;padding:3rem 1rem;color:var(--gl)}
+.empty-icon{font-size:2.5rem;margin-bottom:.75rem}
+
+/* ── MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  display:none;align-items:center;justify-content:center;
+  z-index:200;padding:1rem;
+}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--cb);border-radius:var(--r);width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid var(--cb);font-weight:600}
+.modal-header button{background:transparent;border:none;color:var(--gl);font-size:1.1rem;cursor:pointer;line-height:1}
+.modal-header button:hover{color:var(--w)}
+.modal-body{padding:1.25rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem}
+.form-row.full{grid-template-columns:1fr}
+.form-group{margin-bottom:.75rem}
+.form-group label{display:block;font-size:.6rem;color:var(--gl);font-family:var(--fm);margin-bottom:.3rem;text-transform:uppercase}
+.form-actions{display:flex;gap:.5rem;margin-top:1rem;justify-content:flex-end}
+
+/* ── MISC UI ── */
+.badge{display:inline-block;padding:.15rem .45rem;border-radius:99px;font-size:.6rem;font-weight:600}
+.badge-vip{background:#ffd70022;color:#ffd700}
+.badge-platinum{background:#e040fb22;color:#e040fb}
+.badge-regular{background:rgba(124,106,247,.2);color:#a78bfa}
+.badge-guest{background:rgba(255,255,255,.08);color:#ccc}
+.badge-bl{background:rgba(255,80,80,.15);color:#ff5252}
+.profit-positive{color:#4caf50}
+.profit-negative{color:#f44336}
+.booking-status,.bs-pending{color:#fb923c}.bs-paid{color:#4ade80}.bs-cancelled{color:#f44336}.bs-confirmed{color:var(--cy)}
+.entry-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.75rem;margin:1rem 0}
+.entry-btn{background:rgba(0,230,200,.08);border:1px solid rgba(0,230,200,.2);border-radius:10px;padding:1.25rem .75rem;text-align:center;cursor:pointer;transition:all .2s;user-select:none}
+.entry-btn:hover{background:rgba(0,230,200,.15)}
+.entry-btn.fired{opacity:.5;pointer-events:none;transform:scale(.96)}
+.entry-btn .entry-icon{font-size:1.6rem;margin-bottom:.4rem}
+.entry-btn .entry-label{font-size:.65rem;color:var(--gl)}
+.entry-btn .entry-price{font-size:.8rem;font-weight:700;color:var(--cy)}
+.entry-log{background:rgba(255,255,255,.03);border-radius:8px;padding:.5rem;max-height:220px;overflow-y:auto;font-size:.7rem}
+.entry-log-item{display:flex;justify-content:space-between;padding:.35rem .5rem;border-bottom:1px solid rgba(255,255,255,.04)}
+.entry-ok{color:#4caf50;font-weight:600}
+.entry-btn-ok{background:rgba(76,175,80,.15);border-color:rgba(76,175,80,.3)}
+.ai-bubble{padding:.75rem 1rem;border-radius:10px;max-width:85%;font-size:.78rem;line-height:1.5;white-space:pre-wrap}
+.ai-bubble.user{background:rgba(0,230,200,.1);border:1px solid rgba(0,230,200,.2);margin-left:auto}
+.ai-bubble.assistant{background:rgba(255,255,255,.05);border:1px solid var(--cb)}
+.ai-bubble.typing{opacity:.6;animation:pulse 1s infinite}
+.ai-quick-btn{background:rgba(255,255,255,.05);border:1px solid var(--cb);color:var(--gl);padding:.4rem .75rem;border-radius:99px;font-size:.65rem;cursor:pointer;white-space:nowrap}
+.ai-quick-btn:hover{border-color:var(--cy);color:var(--cy)}
+.filter-btn{background:rgba(255,255,255,.05);border:1px solid var(--cb);color:var(--gl);padding:.35rem .7rem;border-radius:6px;font-size:.7rem;cursor:pointer;transition:all .15s}
+.filter-btn.active{background:rgba(0,230,200,.12);border-color:rgba(0,230,200,.3);color:var(--cy)}
+.breadcrumb{display:flex;align-items:center;gap:.35rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.bcrumb-item{font-size:.72rem;color:var(--gl);cursor:pointer}.bcrumb-item:hover{color:var(--cy)}
+.bcrumb-sep{color:var(--g);font-size:.6rem}
+.drill-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem}
+.drill-card{background:var(--bg2);border:1px solid var(--cb);border-radius:var(--r);padding:1.1rem;cursor:pointer;transition:border-color .2s}
+.drill-card:hover{border-color:rgba(0,230,200,.3)}
+.drill-icon{font-size:1.5rem;margin-bottom:.5rem}
+.drill-title{font-size:.8rem;font-weight:600;margin-bottom:.2rem}
+.drill-count{font-size:1.4rem;font-weight:700;color:var(--cy)}
+.drill-sub{font-size:.6rem;color:var(--gl);margin-top:.2rem}
+.dd-body{padding:.25rem 0}
+.dd-title{font-size:.85rem;font-weight:600;margin-bottom:.15rem}
+.dd-sub{font-size:.65rem;color:var(--gl);margin-bottom:.75rem}
+.dd-icon{font-size:1.8rem;margin-bottom:.5rem}
+.drill-back{background:transparent;border:none;color:var(--gl);font-size:.72rem;cursor:pointer;padding:0;margin-bottom:1rem}
+.drill-back:hover{color:var(--cy)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-head{font-size:.55rem;color:var(--gl);text-align:center;padding:.3rem 0}
+.cal-day{min-height:56px;background:rgba(255,255,255,.02);border-radius:6px;padding:.3rem;cursor:pointer;transition:background .15s}
+.cal-day:hover{background:rgba(255,255,255,.06)}
+.cal-day.today{border:1px solid rgba(0,230,200,.4)}
+.cal-num{font-size:.65rem;color:var(--gl)}
+.cal-dot{width:6px;height:6px;border-radius:50%;margin:1px auto}
+.cal-month-label{font-weight:600;font-size:.85rem}
+.cal-month-nav{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem}
+.cal-nav-btn{background:transparent;border:none;color:var(--gl);font-size:1rem;cursor:pointer;padding:.25rem .4rem}
+.cal-nav-btn:hover{color:var(--cy)}
+.act-title{font-size:.7rem;font-weight:600;margin-bottom:.4rem}
+.actions{display:flex;gap:.35rem;flex-wrap:wrap}
+.cs-val{background:rgba(255,255,255,.05);border:1px solid var(--cb);border-radius:8px;padding:.6rem .9rem;cursor:pointer;font-size:.8rem;position:relative}
+.cs-val.open .cs-list{display:block}
+.cs-list{display:none;position:absolute;top:100%;left:0;right:0;background:#1a1a2e;border:1px solid var(--cb);border-radius:8px;z-index:10;max-height:180px;overflow-y:auto;margin-top:2px}
+.cs-opt{padding:.5rem .75rem;font-size:.75rem;cursor:pointer}
+.cs-opt:hover{background:rgba(0,230,200,.1);color:var(--cy)}
+.elp{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.elt{font-size:.65rem;color:var(--gl);white-space:nowrap}
+.elr{text-align:right}
+.an-chart{height:180px;background:rgba(255,255,255,.03);border-radius:8px;display:flex;align-items:flex-end;gap:2px;padding:1rem .75rem .5rem;overflow:hidden}
+.beo-title{font-size:1.1rem;font-weight:700;margin-bottom:.25rem}
+.beo-body{display:flex;flex-direction:column;gap:.75rem}
+.comp-body{display:flex;flex-direction:column;gap:.75rem}
+.bk-search{margin-bottom:.75rem}
+.an-entries,.an-paid,.an-rev,.an-total{font-size:1.4rem;font-weight:700;color:var(--cy)}
+.pcls{font-size:.65rem}
+.act-title{font-size:.7rem;font-weight:600;color:var(--gl)}
+@keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* ── LEGACY MODAL CLASSES (used in shifts, team, finances) ── */
+.modal-box{background:var(--bg2);border:1px solid var(--cb);border-radius:var(--r);padding:1.25rem;width:100%;max-width:480px}
+.modal-box h3{font-size:.85rem;font-weight:700;margin-bottom:1rem}
+.modal-label{display:block;font-size:.6rem;color:var(--gl);font-family:var(--fm);margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.05em;margin-top:.6rem}
+.modal-input,.modal-select,.modal-textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--cb);color:var(--w);padding:.65rem .85rem;border-radius:8px;outline:none;font-family:var(--fb);font-size:.82rem}
+.modal-input:focus,.modal-select:focus,.modal-textarea:focus{border-color:var(--cy)}
+.modal-select option{background:#1a1a2e}
+.modal-textarea{resize:vertical}
+.modal-footer{display:flex;gap:.5rem;margin-top:1rem;justify-content:flex-end;flex-wrap:wrap}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.5rem}
+@media(max-width:500px){.row2{grid-template-columns:1fr}}
+
+/* ── SHIFTS ── */
+.shift-row{display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;border-bottom:1px solid rgba(255,255,255,.04);font-size:.75rem;cursor:pointer;border-radius:6px;transition:background .12s}
+.shift-row:hover{background:rgba(255,255,255,.03)}
+.shift-date{font-family:var(--fm);color:var(--gl);font-size:.65rem;width:75px;flex-shrink:0}
+.shift-who{flex:1;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shift-time{font-size:.65rem;color:var(--cy);font-family:var(--fm);flex-shrink:0}
+.shift-status{font-size:.6rem;padding:.15rem .4rem;border-radius:4px;flex-shrink:0}
+.ss-planned{background:rgba(255,255,255,.07);color:var(--gl)}
+.ss-confirmed{background:rgba(0,230,200,.12);color:var(--cy)}
+.ss-completed{background:rgba(76,175,80,.12);color:#4caf50}
+.ss-absent{background:rgba(244,67,54,.12);color:#f44336}
+.ss-cancelled{background:rgba(255,255,255,.05);color:var(--g)}
+
+/* ── TEAM (PENDING) ── */
+.pending-card{display:flex;align-items:center;gap:.75rem;padding:.75rem;background:rgba(255,255,255,.02);border:1px solid var(--cb);border-radius:8px;margin-bottom:.4rem;transition:border-color .15s}
+.pending-card:hover{border-color:rgba(0,230,200,.2)}
+.pending-info{flex:1;min-width:0}
+.pending-name{font-size:.8rem;font-weight:600;margin-bottom:.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pending-meta{font-size:.62rem;color:var(--gl)}
+
+/* ── FINANCES ── */
+.fin-row{display:flex;align-items:center;gap:.5rem;padding:.55rem .75rem;border-bottom:1px solid rgba(255,255,255,.04);font-size:.72rem;border-radius:6px;transition:background .12s}
+.fin-row:hover{background:rgba(255,255,255,.02)}
+.fin-date{font-family:var(--fm);color:var(--gl);font-size:.62rem;width:72px;flex-shrink:0}
+.fin-cat{color:var(--gl);font-size:.62rem;width:100px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fin-desc{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--w)}
+.fin-amount{font-family:var(--fd);font-size:.9rem;flex-shrink:0;min-width:80px;text-align:right}
+.fin-type-income .fin-cat::before{content:'↑ ';color:#4caf50}
+.fin-type-expense .fin-cat::before{content:'↓ ';color:#f44336}
+
+/* ── PROFILE ── */
+.profile-header{display:flex;align-items:center;gap:1rem;padding:1.25rem;background:var(--bg2);border:1px solid var(--cb);border-radius:var(--r);margin-bottom:1rem}
+.profile-avatar{width:64px;height:64px;border-radius:50%;background:var(--bg3);border:2px solid var(--cb);display:flex;align-items:center;justify-content:center;font-size:1.6rem;cursor:pointer;overflow:hidden;flex-shrink:0;transition:border-color .2s}
+.profile-avatar:hover{border-color:var(--cy)}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-header label{display:block;font-size:.58rem;color:var(--gl);font-family:var(--fm);margin-bottom:.2rem;text-transform:uppercase}
+.card h3{font-size:.75rem;font-weight:700;margin-bottom:.75rem;color:var(--w)}
+.card label{display:block;font-size:.58rem;color:var(--gl);font-family:var(--fm);margin-bottom:.25rem;margin-top:.6rem;text-transform:uppercase}
+
+/* ── PERMISSIONS TABLE ── */
+.perm-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.perm-table{width:100%;border-collapse:collapse;font-size:.68rem;min-width:500px}
+.perm-table th,.perm-table td{padding:.4rem .5rem;border-bottom:1px solid rgba(255,255,255,.05);text-align:center;white-space:nowrap}
+.perm-table th{color:var(--gl);font-size:.58rem;text-transform:uppercase;letter-spacing:.06em}
+.perm-table td:first-child{text-align:left;color:var(--w);min-width:180px}
+.perm-check{accent-color:var(--cy);width:14px;height:14px;cursor:pointer}
+
+/* ── STAFF DETAIL ── */
+.staff-detail-header{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1rem}
+.staff-detail-ava{width:60px;height:60px;border-radius:50%;background:var(--bg3);border:2px solid var(--cb);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;overflow:hidden}
+.staff-detail-ava img{width:100%;height:100%;object-fit:cover}
+.staff-detail-info{flex:1;min-width:0}
+.staff-detail-name{font-size:1.1rem;font-weight:700;margin-bottom:.3rem}
+
+/* ── NAV GROUPS ── */
+.tab-sep{width:1px;background:var(--cb);flex-shrink:0;align-self:stretch;margin:6px 2px}
+.tab-group-label{font-size:.48rem;color:var(--g);font-family:var(--fm);text-transform:uppercase;letter-spacing:.12em;white-space:nowrap;padding:.35rem .3rem 0;flex-shrink:0;align-self:flex-start}
+
+/* ── STATUS CHIPS ── */
+.chip{display:inline-block;padding:.15rem .5rem;border-radius:99px;font-size:.62rem;font-weight:600;white-space:nowrap}
+.chip-blue{background:rgba(33,150,243,.15);color:#2196f3}
+.chip-yellow{background:rgba(255,152,0,.15);color:#ff9800}
+.chip-green{background:rgba(76,175,80,.15);color:#4caf50}
+.chip-red{background:rgba(244,67,54,.15);color:#f44336}
+.chip-gray{background:rgba(255,255,255,.07);color:var(--gl)}
+.chip-cyan{background:rgba(0,230,200,.12);color:var(--cy)}
+
+/* ── STATS GRID ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.75rem;margin-bottom:1.25rem}
+
+/* ── QUICK ACTIONS ── */
+.quick-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.qa-btn{display:flex;align-items:center;gap:.4rem;background:rgba(0,230,200,.07);border:1px solid rgba(0,230,200,.2);color:var(--w);padding:.5rem .9rem;border-radius:8px;font-size:.72rem;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.qa-btn:hover{background:rgba(0,230,200,.14);border-color:rgba(0,230,200,.4)}
+.qa-btn .qa-icon{font-size:.95rem}
+
+/* ── DASHBOARD ROW ── */
+.dash-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+@media(max-width:600px){.dash-row{grid-template-columns:1fr}}
+
+/* ── EMPTY STATE WITH CTA ── */
+.empty-cta{text-align:center;padding:2.5rem 1rem}
+.empty-cta .empty-icon{font-size:2.2rem;margin-bottom:.6rem}
+.empty-cta p{font-size:.72rem;color:var(--gl);margin-bottom:1rem}
+
+/* ── TASK CARD ── */
+.task-card{background:rgba(255,255,255,.03);border:1px solid var(--cb);border-radius:8px;padding:.75rem;display:flex;align-items:flex-start;gap:.6rem;cursor:pointer;transition:border-color .15s;margin-bottom:.4rem}
+.task-card:hover{border-color:rgba(0,230,200,.25)}
+.task-prio{width:3px;min-height:36px;border-radius:2px;flex-shrink:0}
+.prio-critical,.prio-high{background:#f44336}.prio-medium{background:#ff9800}.prio-low{background:#4caf50}.prio-{background:var(--cb)}
+.task-body{flex:1;min-width:0}
+.task-title{font-size:.78rem;font-weight:500;margin-bottom:.25rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.task-meta{display:flex;gap:.5rem;flex-wrap:wrap;font-size:.62rem;color:var(--gl)}
+.task-status{font-size:.6rem;padding:.1rem .35rem;border-radius:4px;white-space:nowrap;font-weight:600}
+.s-todo{background:rgba(255,255,255,.07);color:var(--gl)}.s-in_progress{background:rgba(33,150,243,.15);color:#2196f3}.s-review{background:rgba(255,152,0,.15);color:#ff9800}.s-done{background:rgba(76,175,80,.15);color:#4caf50}.s-cancelled{background:rgba(244,67,54,.1);color:#f44336}
+.filter-bar{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1rem}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:calc(var(--bnav-h) + .75rem);left:50%;transform:translateX(-50%) translateY(20px);
+  background:#1a1a2e;border:1px solid var(--cb);border-radius:8px;
+  padding:.6rem 1.1rem;font-size:.75rem;pointer-events:none;
+  opacity:0;transition:opacity .2s,transform .2s;z-index:300;white-space:nowrap;max-width:90vw;text-align:center;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.toast-error{background:rgba(255,80,80,.15);border-color:rgba(255,80,80,.4);color:#ff7070}
+#toast.toast-success{background:rgba(0,230,200,.1);border-color:rgba(0,230,200,.3);color:var(--cy)}
+
+/* ── INPUT VALIDATION ── */
+input.input-err,select.input-err,textarea.input-err{border-color:#ff5252!important;animation:shake .3s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.form-group label .req{color:#ff7070;margin-left:2px;font-size:.7rem}
+
+/* ── LOADING SKELETON ── */
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skeleton-line{height:.75rem;margin:.4rem 0;border-radius:4px}
+.skeleton-line.wide{width:100%}.skeleton-line.med{width:65%}.skeleton-line.short{width:35%}
+.skeleton-card{padding:1rem;background:rgba(255,255,255,.03);border-radius:10px;margin:.5rem 0}
+
+/* ── MODAL CLOSE ON BACKDROP ── */
+.modal-overlay{cursor:pointer}
+.modal-overlay .modal{cursor:default}
+
+/* ── RESPONSIVE ── */
+@media(min-width:768px){
+  #bottom-nav{display:none}
+  #staff-main{padding-bottom:2rem}
+}
+@media(max-width:600px){
+  .modal{max-height:92vh}
+  .btn,.btn-sm{min-height:40px}
+  .tabs-scroll{scroll-snap-type:x mandatory}
+  .tab-btn{scroll-snap-align:start}
+  .stats-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- Редирект на auth.html если нет токена — выполняется в staff-app.js -->
+
+<!-- ═══ STAFF APP ═══ -->
+<div id="staff-ui" style="display:none">
+
+  <!-- Top nav -->
+  <nav class="top-nav">
+    <div class="logo">R<span>1</span></div>
+    <div class="tabs-scroll" id="tab-list"></div>
+    <div class="nav-right">
+      <span id="notif-count"></span>
+      <span id="nav-name" style="font-size:.65rem;color:var(--gl);font-family:var(--fm)"></span>
+      <button class="logout-btn" onclick="staffLogout()">Выход</button>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <div id="staff-main"></div>
+
+  <!-- Bottom nav (mobile) -->
+  <div id="bottom-nav"></div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ═══ МОДАЛЬНЫЕ ОКНА ═══ -->
+
+<!-- Задачи -->
+<div class="modal-overlay" id="task-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="task-modal-title">Задача</span>
+      <button onclick="closeModal('task-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="tm-id">
+      <div class="form-group"><label>Название *</label><input id="tm-title" placeholder="Что сделать?"></div>
+      <div class="form-group"><label>Описание</label><textarea id="tm-desc" rows="4" placeholder="Детали..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Приоритет</label><select id="tm-priority"><option value="low">Низкий</option><option value="normal" selected>Средний</option><option value="high">Высокий</option></select></div>
+        <div class="form-group"><label>Статус</label><select id="tm-status"><option value="todo">К выполнению</option><option value="inprogress">В работе</option><option value="done">Готово</option><option value="cancelled">Отмена</option></select></div>
+      </div>
+      <div class="form-row" id="tm-assign-row">
+        <div class="form-group"><label>Исполнитель</label><select id="tm-assigned"></select></div>
+        <div class="form-group"><label>Категория</label><select id="tm-category"><option value="">—</option><option value="bar">Бар</option><option value="sound">Звук</option><option value="light">Свет</option><option value="clean">Уборка</option><option value="repair">Ремонт</option><option value="other">Другое</option></select></div>
+      </div>
+      <div class="form-group"><label>Срок</label><input type="date" id="tm-due"></div>
+      <div class="form-actions">
+        <button class="btn-red" id="tm-delete-btn" style="display:none" onclick="deleteTask()">Удалить</button>
+        <button class="btn-out" onclick="closeModal('task-modal')">Отмена</button>
+        <button class="btn" onclick="saveTaskModal()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Вечеринки -->
+<div class="modal-overlay" id="party-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="party-modal-title">Вечеринка</span>
+      <button onclick="closeModal('party-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pm-id">
+      <div class="form-group"><label>Название *</label><input id="pm-title" placeholder="Название вечеринки"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Дата</label><input type="date" id="pm-date"></div>
+        <div class="form-group"><label>Время</label><input type="time" id="pm-time"></div>
+      </div>
+      <div class="form-group"><label>Тема</label><input id="pm-theme" placeholder="Тема вечеринки"></div>
+      <div class="form-group"><label>Концепция</label><textarea id="pm-concept" rows="2" placeholder="Концепция..."></textarea></div>
+      <div class="form-group"><label>Описание</label><textarea id="pm-desc" rows="3"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Бюджет</label><input type="number" id="pm-budget" placeholder="₽"></div>
+        <div class="form-group"><label>Статус</label>
+          <select id="pm-status">
+            <option value="idea">Идея</option>
+            <option value="planning">Планирование</option>
+            <option value="confirmed">Подтверждено</option>
+            <option value="done">Проведено</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Ответственный</label>
+        <select id="pm-responsible"><option value="">— выбрать —</option></select>
+      </div>
+      <div class="form-actions">
+        <button class="btn-red" id="pm-delete-btn" style="display:none" onclick="deletePartyFromModal()">Удалить</button>
+        <button class="btn-out" onclick="closeModal('party-modal')">Отмена</button>
+        <button class="btn-out" onclick="confirmParty()">Подтвердить</button>
+        <button class="btn" onclick="savePartyModal()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- События -->
+<div class="modal-overlay" id="event-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="event-modal-title">Событие</span>
+      <button onclick="closeModal('event-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="em-id">
+      <div class="form-group"><label>Название *</label><input id="em-title" placeholder="Название события"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Дата</label><input type="date" id="em-date"></div>
+        <div class="form-group"><label>Время начала</label><input type="time" id="em-time-start"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Время окончания</label><input type="time" id="em-time-end"></div>
+        <div class="form-group"><label>Тип</label><select id="em-type"><option value="party">Вечеринка</option><option value="concert">Концерт</option><option value="private">Частное</option><option value="other">Другое</option></select></div>
+      </div>
+      <div class="form-group"><label>Описание</label><textarea id="em-desc" rows="3"></textarea></div>
+      <div class="form-actions">
+        <button class="btn-out" onclick="closeModal('event-modal')">Отмена</button>
+        <button class="btn" onclick="saveEventModal()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Гость (детали) -->
+<div class="modal-overlay" id="guest-detail-modal">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <span id="gd-title">Гость</span>
+      <button onclick="closeModal('guest-detail-modal')">×</button>
+    </div>
+    <div class="modal-body" id="guest-detail-body"></div>
+  </div>
+</div>
+
+<!-- Гость (форма) -->
+<div class="modal-overlay" id="guest-form-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="guest-modal-title">Гость</span>
+      <button onclick="closeModal('guest-form-modal')">×</button>
+    </div>
+    <div class="modal-body" id="guest-modal-body"></div>
+  </div>
+</div>
+
+<!-- Контент/Пост -->
+<div class="modal-overlay" id="post-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="post-modal-title">Пост</span>
+      <button onclick="closeModal('post-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="postm-id">
+      <div class="form-group"><label>Платформа</label><select id="postm-platform"><option value="instagram">Instagram</option><option value="telegram">Telegram</option><option value="vk">VK</option></select></div>
+      <div class="form-group"><label>Заголовок</label><input id="postm-title" placeholder="Заголовок (необязательно)"></div>
+      <div class="form-group"><label>Текст *</label><textarea id="postm-content" rows="6" placeholder="Текст поста..."></textarea><div style="font-size:.6rem;color:var(--gl);text-align:right"><span id="postm-chars">0</span> симв.</div></div>
+      <div class="form-row">
+        <div class="form-group"><label>Запланировано</label><input type="datetime-local" id="postm-scheduled"></div>
+        <div class="form-group"><label>Статус</label><select id="postm-status"><option value="draft">Черновик</option><option value="scheduled">Запланировано</option><option value="published">Опубликовано</option></select></div>
+      </div>
+      <div id="postm-ai-result" style="display:none;margin:.5rem 0;padding:.5rem;background:rgba(0,230,200,.08);border:1px solid rgba(0,230,200,.2);border-radius:8px;font-size:.7rem"></div>
+      <div class="form-actions">
+        <button class="btn-red" id="postm-delete-btn" style="display:none" onclick="deletePost()">Удалить</button>
+        <button class="btn-out" onclick="closeModal('post-modal')">Отмена</button>
+        <button class="btn" onclick="savePostModal()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Смена -->
+<div class="modal-overlay" id="shift-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="shift-modal-title">Смена</span>
+      <button onclick="closeModal('shift-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="sm-id">
+      <div class="form-group"><label>Сотрудник</label><select id="sm-staff"></select></div>
+      <div class="form-row">
+        <div class="form-group"><label>Дата</label><input type="date" id="sm-date"></div>
+        <div class="form-group"><label>Время начала</label><input type="time" id="sm-time-start"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Время окончания</label><input type="time" id="sm-time-end"></div>
+        <div class="form-group"><label>Статус</label><select id="sm-status"><option value="scheduled">Запланировано</option><option value="worked">Отработано</option><option value="cancelled">Отмена</option></select></div>
+      </div>
+      <div class="form-group"><label>Зарплата</label><input type="number" id="sm-salary" placeholder="₽"></div>
+      <div class="form-actions">
+        <button class="btn-out" onclick="closeModal('shift-modal')">Отмена</button>
+        <button class="btn" onclick="saveShiftModal()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Финансы -->
+<div class="modal-overlay" id="finance-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="finance-modal-title">Финансы</span>
+      <button onclick="closeModal('finance-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="fm-id">
+      <div class="form-group"><label>Тип</label><select id="fm-type"><option value="income">Доход</option><option value="expense">Расход</option></select></div>
+      <div class="form-group"><label>Категория</label><select id="fm-category"></select></div>
+      <div class="form-group"><label>Сумма *</label><input type="number" id="fm-amount" placeholder="₽"></div>
+      <div class="form-group"><label>Описание</label><textarea id="fm-desc" rows="3"></textarea></div>
+      <div class="form-group"><label>Дата</label><input type="date" id="fm-date"></div>
+      <div class="form-actions">
+        <button class="btn-out" onclick="closeModal('finance-modal')">Отмена</button>
+        <button class="btn" onclick="saveFinanceModal()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ МОДАЛЬНЫЕ ОКНА: ИНТЕГРАЦИИ ═══ -->
+
+<!-- Настройка Telegram -->
+<div class="modal-overlay" id="telegram-settings-modal">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <span>⚙️ Настройка Telegram</span>
+      <button onclick="closeModal('telegram-settings-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Token бота</label>
+        <input type="text" id="tg-token" placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz">
+        <p style="font-size:.6rem;color:var(--gl);margin-top:.3rem">
+          Получите токен в @BotFather (Telegram)
+        </p>
+      </div>
+      <div class="form-group">
+        <label>Webhook URL (Leadteh)</label>
+        <input type="text" id="tg-webhook" placeholder="https://leadteh.ru/webhook/...">
+      </div>
+      <div class="form-group">
+        <label>Имя бота</label>
+        <input type="text" id="tg-bot-name" placeholder="@ravezone_bot">
+      </div>
+      <div class="form-actions">
+        <button class="btn-out" onclick="checkTelegramBot()">🤖 Проверка бота</button>
+        <button class="btn-out" onclick="setupTelegramWebhook()">🔗 Настроить Webhook</button>
+        <button class="btn-out" onclick="closeModal('telegram-settings-modal')">Отмена</button>
+        <button class="btn" onclick="saveTelegramSettings()">Сохранить</button>
+      </div>
+      <div id="telegram-status" style="font-size:.65rem;text-align:center;margin-top:.5rem"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Настройка MAX -->
+<div class="modal-overlay" id="max-settings-modal">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <span>⚙️ Настройка MAX (VK MAI)</span>
+      <button onclick="closeModal('max-settings-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Token</label>
+        <input type="text" id="max-token" placeholder="vk1.ABC...">
+        <p style="font-size:.6rem;color:var(--gl);margin-top:.3rem">
+          Резервный канал (на будущее)
+        </p>
+      </div>
+      <div class="form-group">
+        <label>Webhook URL</label>
+        <input type="text" id="max-webhook" placeholder="https://...">
+      </div>
+      <div class="form-actions">
+        <button class="btn-out" onclick="closeModal('max-settings-modal')">Отмена</button>
+        <button class="btn" onclick="saveMAXSettings()">Сохранить</button>
+      </div>
+      <div id="max-status" style="font-size:.65rem;text-align:center;margin-top:.5rem"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Список интеграций -->
+<div class="modal-overlay" id="integrations-list-modal">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <span>🔌 Интеграции</span>
+      <button onclick="closeModal('integrations-list-modal')">×</button>
+    </div>
+    <div class="modal-body" id="integrations-list-body">
+      <div style="text-align:center;padding:2rem;color:var(--gl)">Загрузка...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ МОДАЛЬНЫЕ ОКНА: ЗАРПЛАТЫ ═══ -->
+
+<!-- Настройка зарплаты сотрудника -->
+<div class="modal-overlay" id="salary-settings-modal">
+  <div class="modal" style="max-width:550px">
+    <div class="modal-header">
+      <span>💵 Настройка зарплаты</span>
+      <button onclick="closeModal('salary-settings-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ss-staff-id">
+
+      <div class="form-group">
+        <label>Сотрудник</label>
+        <select id="ss-staff">
+          <option value="">— Выберите сотрудника —</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Тип зарплаты *</label>
+        <select id="ss-type" onchange="toggleSalaryFields()">
+          <option value="fixed">Оклад (фиксированный)</option>
+          <option value="hourly">Почасовая оплата</option>
+          <option value="percent_profit">Процент от прибыли</option>
+          <option value="percent_bar">Процент от оборота бара</option>
+          <option value="percent_deposit">Процент от депозитов</option>
+          <option value="per_shift">Оплата за смену</option>
+          <option value="mixed">Смешанная (комбинированная)</option>
+        </select>
+      </div>
+      
+      <!-- Поля для разных типов -->
+      <div id="ss-fixed-group" class="form-group">
+        <label>Оклад (₽ в месяц)</label>
+        <input type="number" id="ss-fixed" placeholder="50000">
+      </div>
+      
+      <div id="ss-hourly-group" class="form-group" style="display:none">
+        <label>Ставка (₽ в час)</label>
+        <input type="number" id="ss-hourly" placeholder="300">
+      </div>
+      
+      <div id="ss-percent-profit-group" class="form-group" style="display:none">
+        <label>Процент от прибыли (%)</label>
+        <input type="number" id="ss-percent-profit" placeholder="10" step="0.1">
+      </div>
+      
+      <div id="ss-percent-bar-group" class="form-group" style="display:none">
+        <label>Процент от бара (%)</label>
+        <input type="number" id="ss-percent-bar" placeholder="5" step="0.1">
+      </div>
+      
+      <div id="ss-percent-deposit-group" class="form-group" style="display:none">
+        <label>Процент от депозитов (%)</label>
+        <input type="number" id="ss-percent-deposit" placeholder="7" step="0.1">
+      </div>
+      
+      <div id="ss-per-shift-group" class="form-group" style="display:none">
+        <label>Сумма за смену (₽)</label>
+        <input type="number" id="ss-per-shift" placeholder="2000">
+      </div>
+      
+      <div id="ss-mixed-group" class="form-group" style="display:none">
+        <label>Конфигурация (JSON)</label>
+        <textarea id="ss-mixed-config" rows="4" placeholder='{"fixed":30000,"percent_bar":3,"percent_deposit":2}'></textarea>
+        <p style="font-size:.6rem;color:var(--gl);margin-top:.3rem">
+          Пример: {"fixed":30000,"percent_bar":3,"percent_deposit":2}
+        </p>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Мин. гарантия (₽)</label>
+          <input type="number" id="ss-min-guarantee" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label>Макс. планка (₽)</label>
+          <input type="number" id="ss-max-cap" placeholder="0">
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button class="btn-out" onclick="closeModal('salary-settings-modal')">Отмена</button>
+        <button class="btn" onclick="saveSalarySettings()">Сохранить</button>
+      </div>
+      <div id="salary-settings-status" style="font-size:.65rem;text-align:center;margin-top:.5rem"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Расчёт зарплаты -->
+<div class="modal-overlay" id="salary-calculate-modal">
+  <div class="modal" style="max-width:550px">
+    <div class="modal-header">
+      <span>🧮 Расчёт зарплаты</span>
+      <button onclick="closeModal('salary-calculate-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Сотрудник</label>
+        <select id="sc-staff-select">
+          <option value="">Выберите сотрудника</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Месяц</label>
+        <input type="month" id="sc-period" value="">
+      </div>
+      
+      <div id="salary-calculate-result" style="margin-top:1rem;padding:1rem;background:rgba(0,230,200,0.05);border:1px solid rgba(0,230,200,0.2);border-radius:8px;display:none">
+        <!-- Результат расчёта -->
+      </div>
+      
+      <div class="form-actions">
+        <button class="btn-out" onclick="closeModal('salary-calculate-modal')">Отмена</button>
+        <button class="btn" onclick="calculateSalary()">Рассчитать</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Список зарплат -->
+<div class="modal-overlay" id="salary-list-modal">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-header">
+      <span>💵 Зарплаты сотрудников</span>
+      <button onclick="closeModal('salary-list-modal')">×</button>
+    </div>
+    <div class="modal-body" id="salary-list-body">
+      <div style="text-align:center;padding:2rem;color:var(--gl)">Загрузка...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Создать / редактировать начисление -->
+<div class="modal-overlay" id="salary-accrual-modal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <span>💵 Начисление зарплаты</span>
+      <button onclick="closeModal('salary-accrual-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="sa-id">
+
+      <div class="form-group">
+        <label>Сотрудник</label>
+        <select id="sa-staff">
+          <option value="">— Выберите сотрудника —</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Период (месяц)</label>
+        <input type="month" id="sa-period">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Оклад / база (₽)</label>
+          <input type="number" id="sa-base" value="0" min="0" oninput="updateSalaryTotal()">
+        </div>
+        <div class="form-group">
+          <label>Смены / проценты (₽)</label>
+          <input type="number" id="sa-shifts" value="0" min="0" oninput="updateSalaryTotal()">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Бонус (₽)</label>
+          <input type="number" id="sa-bonus" value="0" min="0" oninput="updateSalaryTotal()" style="border-color:rgba(76,175,80,.4)">
+        </div>
+        <div class="form-group">
+          <label>Штраф (₽)</label>
+          <input type="number" id="sa-fine" value="0" min="0" oninput="updateSalaryTotal()" style="border-color:rgba(244,67,54,.4)">
+        </div>
+      </div>
+
+      <div style="background:rgba(0,230,200,.06);border:1px solid rgba(0,230,200,.2);border-radius:8px;padding:.75rem 1rem;display:flex;justify-content:space-between;align-items:center;margin:.5rem 0 1rem">
+        <span style="font-size:.75rem;color:var(--gl)">Итого к выплате</span>
+        <span id="sa-total" style="font-family:var(--fd);font-size:1.5rem;color:var(--cy)">0 ₽</span>
+      </div>
+
+      <div class="form-group">
+        <label>Комментарий</label>
+        <input type="text" id="sa-comment" placeholder="Премия за мероприятие, больничный…">
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-out" id="sa-delete-btn" style="display:none;color:#f44336;border-color:#f44336" onclick="deleteSalaryAccrual()">🗑 Удалить</button>
+        <button class="btn-out" onclick="closeModal('salary-accrual-modal')">Отмена</button>
+        <button class="btn" id="sa-pay-btn" style="display:none;background:#4caf50" onclick="paySalaryAccrual()">✅ Выплачено</button>
+        <button class="btn" onclick="saveSalaryAccrual()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ МОДАЛЬНЫЕ ОКНА: РАССЫЛКИ ═══ -->
+
+<div class="modal-overlay" id="message-create-modal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <span>📨 Новая рассылка</span>
+      <button onclick="closeModal('message-create-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Получатели</label>
+        <select id="mc-audience">
+          <option value="all_staff">Весь персонал</option>
+          <option value="all_guests">Все гости</option>
+          <option value="vip_guests">VIP-гости</option>
+          <option value="birthday_week">Дни рождения на этой неделе</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Сообщение *</label>
+        <textarea id="mc-text" rows="5" placeholder="Введите текст сообщения…" style="min-height:120px"></textarea>
+        <div style="text-align:right;font-size:.7rem;color:var(--gl);margin-top:.3rem"><span id="mc-char-count">0</span> / 4096</div>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:.75rem 1rem;font-size:.8rem;color:var(--gl);line-height:1.6;margin-bottom:.5rem">
+        💡 Сообщение будет отправлено через Telegram-бот тем, кто привязал аккаунт
+      </div>
+      <div class="form-actions">
+        <button class="btn-out" onclick="closeModal('message-create-modal')">Отмена</button>
+        <button class="btn" onclick="sendBroadcastMessage()">📤 Отправить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ МОДАЛЬНЫЕ ОКНА: ЛОЯЛЬНОСТЬ ═══ -->
+
+<!-- Уровни лояльности -->
+<div class="modal-overlay" id="loyalty-tier-modal">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <span>🎁 Уровень лояльности</span>
+      <button onclick="closeModal('loyalty-tier-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="lt-id">
+      
+      <div class="form-group">
+        <label>Название уровня *</label>
+        <input type="text" id="lt-name" placeholder="VIP, Platinum и т.д.">
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Цвет</label>
+          <input type="color" id="lt-color" value="#FFD700" style="width:100%;height:40px">
+        </div>
+        <div class="form-group">
+          <label>Иконка</label>
+          <input type="text" id="lt-icon" placeholder="💎">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Мин. траты (₽)</label>
+          <input type="number" id="lt-min-spent" placeholder="50000">
+        </div>
+        <div class="form-group">
+          <label>Скидка (%)</label>
+          <input type="number" id="lt-discount" placeholder="10" step="0.1">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Привилегии</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem">
+          <label style="font-size:.65rem;display:flex;align-items:center;gap:.3rem">
+            <input type="checkbox" id="lt-free-entry"> Бесплатный вход
+          </label>
+          <label style="font-size:.65rem;display:flex;align-items:center;gap:.3rem">
+            <input type="checkbox" id="lt-priority-booking"> Приоритетное бронирование
+          </label>
+          <label style="font-size:.65rem;display:flex;align-items:center;gap:.3rem">
+            <input type="checkbox" id="lt-personal-manager"> Персональный менеджер
+          </label>
+          <label style="font-size:.65rem;display:flex;align-items:center;gap:.3rem">
+            <input type="checkbox" id="lt-vip-access"> VIP доступ
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Авто-повышение</label>
+          <select id="lt-auto-upgrade">
+            <option value="1">Да</option>
+            <option value="0">Нет</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Авто-понижение</label>
+          <select id="lt-auto-downgrade">
+            <option value="0">Нет</option>
+            <option value="1">Да</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button class="btn-out" onclick="closeModal('loyalty-tier-modal')">Отмена</button>
+        <button class="btn" onclick="saveLoyaltyTier()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Правила начисления баллов -->
+<div class="modal-overlay" id="loyalty-rule-modal">
+  <div class="modal" style="max-width:550px">
+    <div class="modal-header">
+      <span>⭐ Правило начисления баллов</span>
+      <button onclick="closeModal('loyalty-rule-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="lr-id">
+      
+      <div class="form-group">
+        <label>Название правила *</label>
+        <input type="text" id="lr-name" placeholder="День рождения, Будний день и т.д.">
+      </div>
+      
+      <div class="form-group">
+        <label>Тип правила</label>
+        <select id="lr-type" onchange="toggleLoyaltyRuleFields()">
+          <option value="spent">Процент от трат</option>
+          <option value="visit">За посещение</option>
+          <option value="birthday">День рождения</option>
+          <option value="weekday">Будний день</option>
+          <option value="referral">Привёл друга</option>
+        </select>
+      </div>
+      
+      <div id="lr-percent-group" class="form-group">
+        <label>Процент от трат (%)</label>
+        <input type="number" id="lr-percent" placeholder="1" step="0.1">
+        <p style="font-size:.6rem;color:var(--gl);margin-top:.3rem">1% = 1 балл за 100₽</p>
+      </div>
+      
+      <div id="lr-points-group" class="form-group">
+        <label>Баллов</label>
+        <input type="number" id="lr-points" placeholder="100">
+      </div>
+      
+      <div id="lr-weekday-group" class="form-group" style="display:none">
+        <label>День недели</label>
+        <select id="lr-weekday">
+          <option value="mon">Понедельник</option>
+          <option value="tue">Вторник</option>
+          <option value="wed">Среда</option>
+          <option value="thu">Четверг</option>
+          <option value="fri">Пятница</option>
+          <option value="sat">Суббота</option>
+          <option value="sun">Воскресенье</option>
+        </select>
+      </div>
+      
+      <div class="form-actions">
+        <button class="btn-out" onclick="closeModal('loyalty-rule-modal')">Отмена</button>
+        <button class="btn" onclick="saveLoyaltyRule()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Правила списания баллов -->
+<div class="modal-overlay" id="loyalty-redemption-modal">
+  <div class="modal" style="max-width:550px">
+    <div class="modal-header">
+      <span>💰 Правило списания баллов</span>
+      <button onclick="closeModal('loyalty-redemption-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="lrr-id">
+      
+      <div class="form-group">
+        <label>Название правила *</label>
+        <input type="text" id="lrr-name" placeholder="Стандартное списание">
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Мин. баллов</label>
+          <input type="number" id="lrr-min-points" placeholder="100">
+        </div>
+        <div class="form-group">
+          <label>Макс. баллов</label>
+          <input type="number" id="lrr-max-points" placeholder="5000">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Мин. сумма счёта (₽)</label>
+          <input type="number" id="lrr-min-bill" placeholder="500">
+        </div>
+        <div class="form-group">
+          <label>Макс. скидка (%)</label>
+          <input type="number" id="lrr-max-discount" placeholder="50">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Курс обмена</label>
+        <input type="number" id="lrr-rate" placeholder="1" step="0.1">
+        <p style="font-size:.6rem;color:var(--gl);margin-top:.3rem">1 балл = ? ₽</p>
+      </div>
+      
+      <div class="form-group">
+        <label>Что можно оплачивать</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem">
+          <label style="font-size:.65rem;display:flex;align-items:center;gap:.3rem">
+            <input type="checkbox" id="lrr-pay-bar" checked> Бар
+          </label>
+          <label style="font-size:.65rem;display:flex;align-items:center;gap:.3rem">
+            <input type="checkbox" id="lrr-pay-kitchen" checked> Кухня
+          </label>
+          <label style="font-size:.65rem;display:flex;align-items:center;gap:.3rem">
+            <input type="checkbox" id="lrr-pay-deposit"> Депозиты
+          </label>
+          <label style="font-size:.65rem;display:flex;align-items:center;gap:.3rem">
+            <input type="checkbox" id="lrr-pay-tickets"> Билеты
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button class="btn-out" onclick="closeModal('loyalty-redemption-modal')">Отмена</button>
+        <button class="btn" onclick="saveLoyaltyRedemption()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Баланс гостя -->
+<div class="modal-overlay" id="loyalty-balance-modal">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <span>🎁 Баланс гостя</span>
+      <button onclick="closeModal('loyalty-balance-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Гость</label>
+        <select id="lb-guest-select">
+          <option value="">Выберите гостя</option>
+        </select>
+      </div>
+      
+      <div id="lb-balance-info" style="display:none;margin-top:1rem;padding:1rem;background:rgba(0,230,200,0.05);border:1px solid rgba(0,230,200,0.2);border-radius:8px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem">
+          <span style="color:var(--gl)">Баланс:</span>
+          <span style="font-weight:700;color:var(--cy)" id="lb-balance">0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem">
+          <span style="color:var(--gl)">Всего заработано:</span>
+          <span style="font-weight:600" id="lb-lifetime">0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--gl)">Уровень:</span>
+          <span style="font-weight:600" id="lb-tier">Guest</span>
+        </div>
+      </div>
+      
+      <div class="form-actions" style="margin-top:1rem">
+        <button class="btn-sm" onclick="openModal('loyalty-earn-modal')">➕ Начислить</button>
+        <button class="btn-sm" onclick="openModal('loyalty-spend-modal')">💰 Списать</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Начислить баллы -->
+<div class="modal-overlay" id="loyalty-earn-modal">
+  <div class="modal" style="max-width:450px">
+    <div class="modal-header">
+      <span>➕ Начислить баллы</span>
+      <button onclick="closeModal('loyalty-earn-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Гость</label>
+        <select id="le-guest">
+          <option value="">Выберите гостя</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Баллов</label>
+        <input type="number" id="le-points" placeholder="100">
+      </div>
+      
+      <div class="form-group">
+        <label>Причина</label>
+        <input type="text" id="le-reason" placeholder="День рождения, акция и т.д.">
+      </div>
+      
+      <div class="form-actions">
+        <button class="btn-out" onclick="closeModal('loyalty-earn-modal')">Отмена</button>
+        <button class="btn" onclick="earnPoints()">Начислить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Списать баллы -->
+<div class="modal-overlay" id="loyalty-spend-modal">
+  <div class="modal" style="max-width:450px">
+    <div class="modal-header">
+      <span>💰 Списать баллы</span>
+      <button onclick="closeModal('loyalty-spend-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Гость</label>
+        <select id="ls-guest">
+          <option value="">Выберите гостя</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Баллов</label>
+        <input type="number" id="ls-points" placeholder="100">
+      </div>
+      
+      <div class="form-group">
+        <label>Причина</label>
+        <input type="text" id="ls-reason" placeholder="Оплата счёта">
+      </div>
+      
+      <div class="form-actions">
+        <button class="btn-out" onclick="closeModal('loyalty-spend-modal')">Отмена</button>
+        <button class="btn" onclick="spendPoints()">Списать</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ МОДАЛЬНЫЕ ОКНА: ГОСТИ ═══ -->
+<div class="modal-overlay" id="guest-modal" onclick="if(event.target===this)closeModal('guest-modal')">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <span id="guest-modal-title">Гость</span>
+      <button onclick="closeModal('guest-modal')">×</button>
+    </div>
+    <div id="guest-modal-body" class="modal-body"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="guest-detail-modal" onclick="if(event.target===this)closeModal('guest-detail-modal')">
+  <div class="modal" style="max-width:520px;max-height:88vh;overflow-y:auto">
+    <div class="modal-header">
+      <span id="gd-title">Карточка гостя</span>
+      <button onclick="closeModal('guest-detail-modal')">×</button>
+    </div>
+    <div id="guest-detail-body" class="modal-body"></div>
+  </div>
+</div>
+
+<!-- ═══ МОДАЛЬНОЕ ОКНО: ШТРАФЫ / БОНУСЫ ═══ -->
+<div class="modal-overlay" id="fines-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span id="fines-modal-title">⚠️ Штраф / Бонус</span>
+      <button onclick="closeModal('fines-modal')">×</button>
+    </div>
+    <div class="modal-body" id="fines-body">
+      <!-- Заполняется через openFinesBonuses() -->
+    </div>
+  </div>
+</div>
+
+<!-- ═══ МОДАЛЬНОЕ ОКНО: ДОБАВИТЬ СОТРУДНИКА ВРУЧНУЮ ═══ -->
+<div class="modal-overlay" id="add-staff-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span>👤 Добавить сотрудника</span>
+      <button onclick="closeModal('add-staff-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Имя *</label>
+          <input type="text" id="as-name" placeholder="Иван Иванов">
+        </div>
+        <div class="form-group">
+          <label>Роль *</label>
+          <select id="as-role">
+            <option value="admin">Администратор</option>
+            <option value="hostess">Хостес</option>
+            <option value="bartender">Бармен</option>
+            <option value="security">Охранник</option>
+            <option value="dj">DJ</option>
+            <option value="smm">СММ</option>
+            <option value="designer">Дизайнер</option>
+            <option value="stories_maker">Сторис мейкер</option>
+            <option value="light_tech">Светотехник</option>
+            <option value="promoter">Промоутер</option>
+            <option value="ambassador">Амбассадор</option>
+            <option value="ambassador_manager">Менеджер амбассадоров</option>
+            <option value="accountant">Бухгалтер</option>
+            <option value="art_director">Арт директор</option>
+            <option value="director">Директор</option>
+            <option value="dev_director">Директор по развитию</option>
+            <option value="owner">Владелец</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Логин *</label>
+          <input type="text" id="as-username" placeholder="ivan.ivanov" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>Пароль *</label>
+          <input type="password" id="as-password" placeholder="Минимум 6 символов" autocomplete="new-password">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Телефон</label>
+          <input type="tel" id="as-phone" placeholder="+7 900 000-00-00">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="as-email" placeholder="staff@ravez.ru">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-out" onclick="closeModal('add-staff-modal')">Отмена</button>
+        <button class="btn" onclick="saveNewStaff()">Создать</button>
+      </div>
+      <div id="as-status" style="font-size:.65rem;text-align:center;margin-top:.5rem;color:var(--gl)"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Вспомогательная функция для кастомного select (до загрузки staff-app.js)
+function csSelect(wrapId, val, label) {
+  const wrap = document.getElementById(wrapId);
+  if (!wrap) return;
+  const hiddenInput = wrap.querySelector('input[type=hidden]');
+  const labelEl = wrap.querySelector('span');
+  if (hiddenInput) hiddenInput.value = val;
+  if (labelEl) labelEl.textContent = label;
+  wrap.classList.remove('open');
+}
+function csReset(wrapId) {
+  const wrap = document.getElementById(wrapId);
+  if (!wrap) return;
+  const hiddenInput = wrap.querySelector('input[type=hidden]');
+  const labelEl = wrap.querySelector('span');
+  if (hiddenInput) hiddenInput.value = '';
+  if (labelEl) labelEl.textContent = labelEl.dataset.placeholder || '—';
+}
+// Закрыть кастомный select при клике вне
+document.addEventListener('click', e => {
+  if (!e.target.closest('.cs-val')) {
+    document.querySelectorAll('.cs-val.open').forEach(v => v.classList.remove('open'));
+  }
+});
+</script>
+<script src="staff-app.js"></script>
+</body>
+</html>
