@@ -43,9 +43,18 @@ export const EVENT_STATUSES = {
   draft:     { label: 'Черновик',    color: 'badge-neutral' },
   planning:  { label: 'Планируется', color: 'badge-warning' },
   confirmed: { label: 'Подтверждено',color: 'badge-success' },
+  in_progress:{ label: 'Live',       color: 'badge-info' },
   cancelled: { label: 'Отменено',    color: 'badge-danger' },
   completed: { label: 'Завершено',   color: 'badge-info' },
 }
+
+export const EVENT_TYPES = {
+  standard: { label: 'Стандартное' },
+  private: { label: 'Закрытое' },
+  special: { label: 'Спецпроект' },
+}
+
+export const EVENT_LIFECYCLE = ['draft', 'planning', 'confirmed', 'in_progress', 'completed']
 
 export const SALARY_MODELS = [
   { value: 'fixed', label: 'Фикс за период' },

@@ -16,6 +16,36 @@ const DIRECTION_NAMES = {
   4: 'Финансовый блок',
 }
 
+const EVENT_LIFECYCLE = ['draft', 'planning', 'confirmed', 'in_progress', 'completed']
+
+const EVENT_CHECKLIST_TEMPLATE = {
+  draft: [
+    'Создать карточку события',
+    'Назначить ответственных (РП/модули)',
+    'Утвердить плановый бюджет',
+  ],
+  planning: [
+    'Сформирован контент-план',
+    'Согласованы DJ и световой пресет',
+    'Открыты задачи по подготовке',
+  ],
+  confirmed: [
+    'Подтверждены смены команды',
+    'Проверена готовность площадки и бара',
+    'Проверены брони и тарифы входа',
+  ],
+  in_progress: [
+    'Включен live-контроль входа/кассы',
+    'Зафиксированы инциденты (если были)',
+    'Собраны данные выручки за событие',
+  ],
+  completed: [
+    'Собран финансовый разбор (P&L)',
+    'Проверена зарплатная ведомость',
+    'Заполнены выводы по мероприятию',
+  ],
+}
+
 const mockDb = {
   directions: [
     { id: 1, name: 'Операционный блок', owner_role: 'admin' },
@@ -51,12 +81,34 @@ const mockDb = {
     { id: 16, name: 'Главный специалист развития', role: 'dev_director', org_level: 'mrp', direction_id: 3, module_id: 7, manager_id: 5, login: 'growth_lead', phone: '+7 900 777-70-10', email: 'growth.lead@ravez.ru', city: 'Казань', birthday: '1995-07-18', bio: 'Ведет проекты развития и партнерства.', photo: '', active: true },
   ],
   tasks: [
-    { id: 1, title: 'Проверить бронь столов', status: 'in_progress', assigned_to: 3, deadline: '2026-03-25' },
-    { id: 2, title: 'Подготовить свет к сету DJ', status: 'todo', assigned_to: 10, deadline: '2026-03-26' },
+    { id: 1, event_id: 1, title: 'Проверить бронь столов', status: 'in_progress', assigned_to: 3, deadline: '2026-03-27' },
+    { id: 2, event_id: 1, title: 'Подготовить свет к сету DJ', status: 'todo', assigned_to: 10, deadline: '2026-03-27' },
   ],
-  events: [{ id: 1, title: 'Friday Night', date: '2026-03-27', time_start: '22:00', time_end: '05:00', status: 'planning' }],
-  shifts: [{ id: 1, staff_id: 7, date: '2026-03-25', time_start: '20:00', time_end: '04:00' }],
-  finances: [{ id: 1, type: 'income', amount: 120000, category: 'bar', description: 'Выручка', date: '2026-03-24' }],
+  events: [
+    {
+      id: 1,
+      title: 'Friday Night',
+      event_type: 'standard',
+      date: '2026-03-27',
+      time_start: '22:00',
+      time_end: '05:00',
+      status: 'planning',
+      expected_guests: 350,
+      budget_plan: 280000,
+      description: 'Основная пятничная вечеринка',
+    },
+  ],
+  shifts: [
+    { id: 1, event_id: 1, staff_id: 7, date: '2026-03-27', time_start: '20:00', time_end: '04:00' },
+    { id: 2, event_id: 1, staff_id: 8, date: '2026-03-27', time_start: '20:00', time_end: '04:00' },
+    { id: 3, event_id: 1, staff_id: 10, date: '2026-03-27', time_start: '21:00', time_end: '04:00' },
+  ],
+  finances: [
+    { id: 1, event_id: 1, type: 'income', amount: 120000, category: 'bar', description: 'Выручка бара', date: '2026-03-27' },
+    { id: 2, event_id: 1, type: 'income', amount: 45000, category: 'entrance', description: 'Входные билеты', date: '2026-03-27' },
+    { id: 3, event_id: 1, type: 'expense', amount: 38000, category: 'bar_cost', description: 'Закупка бара', date: '2026-03-27' },
+    { id: 4, type: 'expense', amount: 150000, category: 'rent', description: 'Аренда', date: '2026-03-01' },
+  ],
   guests: [],
   salaries: [],
   payroll_rules: [
@@ -65,6 +117,7 @@ const mockDb = {
     { id: 3, staff_id: 12, model: 'piecework', fixed_amount: 0, rate_per_shift: 0, percent_rate: 0, piece_rate: 1500, bonus_fixed: 0 },
   ],
   payrolls: [],
+  event_checklists: [],
   tiers: [{ id: 1, name: 'Base', discount: 0 }, { id: 2, name: 'VIP', discount: 10 }],
   integrations: [
     { id: 1, name: 'Telegram bot', status: 'active' },
@@ -110,6 +163,64 @@ function canManageDirection(current, directionId) {
   if (!leadershipRoles.includes(current.role)) return false
   if (fullAccessRoles.includes(current.role)) return true
   return Number(current.direction_id) === Number(directionId)
+}
+
+function ensureEventChecklist(eventId) {
+  EVENT_LIFECYCLE.forEach(stage => {
+    const stageItems = EVENT_CHECKLIST_TEMPLATE[stage] || []
+    stageItems.forEach((label, idx) => {
+      const key = `${stage}-${idx}`
+      const existing = mockDb.event_checklists.find(item => (
+        Number(item.event_id) === Number(eventId)
+        && item.stage === stage
+        && item.item_key === key
+      ))
+      if (!existing) {
+        mockDb.event_checklists.push({
+          id: getNextId(mockDb.event_checklists),
+          event_id: Number(eventId),
+          stage,
+          item_key: key,
+          label,
+          done: false,
+          assignee_id: null,
+          deadline: '',
+          note: '',
+          task_id: null,
+        })
+      }
+    })
+  })
+}
+
+function canMoveEventToStatus(eventId, nextStatus) {
+  const current = mockDb.events.find(item => Number(item.id) === Number(eventId))
+  if (!current) return { ok: false, error: 'Событие не найдено' }
+  if (nextStatus === 'cancelled') return { ok: true }
+  const currentIdx = EVENT_LIFECYCLE.indexOf(current.status)
+  const nextIdx = EVENT_LIFECYCLE.indexOf(nextStatus)
+  if (nextIdx === -1) return { ok: false, error: 'Недопустимый этап' }
+  if (currentIdx === -1) return { ok: false, error: 'Текущий этап не поддерживается' }
+  if (nextIdx > currentIdx + 1) return { ok: false, error: 'Можно перейти только на следующий этап' }
+  if (nextIdx <= currentIdx) return { ok: true }
+
+  ensureEventChecklist(eventId)
+  const required = mockDb.event_checklists.filter(item => (
+    Number(item.event_id) === Number(eventId) && item.stage === current.status
+  ))
+  const notDone = required.filter(item => !item.done)
+  if (notDone.length > 0) {
+    return { ok: false, error: 'Закройте все пункты текущего этапа перед переходом' }
+  }
+  const missingResponsible = required.filter(item => !item.assignee_id)
+  if (missingResponsible.length > 0) {
+    return { ok: false, error: 'Назначьте ответственных по всем пунктам текущего этапа' }
+  }
+  const missingDeadline = required.filter(item => !item.deadline)
+  if (missingDeadline.length > 0) {
+    return { ok: false, error: 'Укажите дедлайны по всем пунктам текущего этапа' }
+  }
+  return { ok: true }
 }
 
 async function mockRequest(action, options = {}) {
@@ -201,7 +312,14 @@ async function mockRequest(action, options = {}) {
   }
 
   if (action === 'tasks/list' && method === 'GET') return { ok: true, tasks: mockDb.tasks }
-  if (action === 'events/list' && method === 'GET') return { ok: true, events: mockDb.events }
+  if (action === 'events/list' && method === 'GET') {
+    mockDb.events.forEach(eventItem => ensureEventChecklist(eventItem.id))
+    return { ok: true, events: mockDb.events }
+  }
+  if (action === 'event/checklist/list' && method === 'GET') {
+    mockDb.events.forEach(eventItem => ensureEventChecklist(eventItem.id))
+    return { ok: true, items: mockDb.event_checklists }
+  }
   if (action === 'shifts/list' && method === 'GET') return { ok: true, shifts: mockDb.shifts }
   if (action === 'finances/list' && method === 'GET') return { ok: true, finances: mockDb.finances }
   if (action === 'guests/list' && method === 'GET') return { ok: true, guests: mockDb.guests }
@@ -239,11 +357,77 @@ async function mockRequest(action, options = {}) {
     } else {
       mockDb.events.push(item)
     }
+    ensureEventChecklist(item.id)
     return { ok: true, event: item }
   }
 
+  if (action === 'event/checklist/toggle' && method === 'POST') {
+    if (!payload.id) return { error: 'Не указан пункт чек-листа' }
+    mockDb.event_checklists = mockDb.event_checklists.map(item => (
+      Number(item.id) === Number(payload.id) ? { ...item, done: payload.done === true } : item
+    ))
+    return { ok: true }
+  }
+
+  if (action === 'event/checklist/update' && method === 'POST') {
+    if (!payload.id) return { error: 'Не указан пункт чек-листа' }
+    mockDb.event_checklists = mockDb.event_checklists.map(item => (
+      Number(item.id) === Number(payload.id)
+        ? {
+          ...item,
+          assignee_id: payload.assignee_id ? Number(payload.assignee_id) : null,
+          deadline: payload.deadline || '',
+          note: payload.note || '',
+          task_id: payload.task_id ? Number(payload.task_id) : (item.task_id || null),
+        }
+        : item
+    ))
+    return { ok: true }
+  }
+
+  if (action === 'event/checklist/create-task' && method === 'POST') {
+    if (!payload.checklist_id) return { error: 'Не указан пункт чек-листа' }
+    const checklist = mockDb.event_checklists.find(item => Number(item.id) === Number(payload.checklist_id))
+    if (!checklist) return { error: 'Пункт чек-листа не найден' }
+    if (checklist.task_id) {
+      return { ok: true, task: mockDb.tasks.find(task => Number(task.id) === Number(checklist.task_id)) || null }
+    }
+    const taskItem = {
+      id: getNextId(mockDb.tasks),
+      event_id: Number(checklist.event_id),
+      title: checklist.label,
+      description: checklist.note || '',
+      status: 'new',
+      assigned_to: checklist.assignee_id ? Number(checklist.assignee_id) : null,
+      deadline: checklist.deadline || '',
+    }
+    mockDb.tasks.push(taskItem)
+    mockDb.event_checklists = mockDb.event_checklists.map(item => (
+      Number(item.id) === Number(payload.checklist_id)
+        ? { ...item, task_id: taskItem.id }
+        : item
+    ))
+    return { ok: true, task: taskItem }
+  }
+
+  if (action === 'event/status/set' && method === 'POST') {
+    if (!payload.event_id || !payload.status) return { error: 'Нужны event_id и status' }
+    const check = canMoveEventToStatus(payload.event_id, payload.status)
+    if (!check.ok) return { error: check.error }
+    mockDb.events = mockDb.events.map(item => (
+      Number(item.id) === Number(payload.event_id)
+        ? { ...item, status: payload.status }
+        : item
+    ))
+    return { ok: true }
+  }
+
   if (action === 'shift/save' && method === 'POST') {
-    const item = { ...payload, id: payload.id || getNextId(mockDb.shifts) }
+    const item = {
+      ...payload,
+      event_id: payload.event_id ? Number(payload.event_id) : null,
+      id: payload.id || getNextId(mockDb.shifts),
+    }
     if (payload.id) {
       mockDb.shifts = mockDb.shifts.map(shiftItem => (shiftItem.id === payload.id ? item : shiftItem))
     } else {
@@ -253,7 +437,11 @@ async function mockRequest(action, options = {}) {
   }
 
   if (action === 'finance/save' && method === 'POST') {
-    const item = { ...payload, id: payload.id || getNextId(mockDb.finances) }
+    const item = {
+      ...payload,
+      event_id: payload.event_id ? Number(payload.event_id) : null,
+      id: payload.id || getNextId(mockDb.finances),
+    }
     if (payload.id) {
       mockDb.finances = mockDb.finances.map(record => (record.id === payload.id ? item : record))
     } else {
@@ -295,7 +483,9 @@ async function mockRequest(action, options = {}) {
     const nextIdStart = getNextId(mockDb.payrolls)
     const generated = mockDb.payroll_rules.map((rule, idx) => {
       const staffMember = mockDb.staff.find(person => Number(person.id) === Number(rule.staff_id))
-      const shiftCount = mockDb.shifts.filter(shift => Number(shift.staff_id) === Number(rule.staff_id)).length || 1
+      const staffShifts = mockDb.shifts.filter(shift => Number(shift.staff_id) === Number(rule.staff_id))
+      const shiftCount = staffShifts.length || 1
+      const eventId = staffShifts[0]?.event_id || null
       const pieceUnits = staffMember?.role === 'designer' ? 20 : 0
       let amount = 0
 
@@ -323,6 +513,7 @@ async function mockRequest(action, options = {}) {
         status: 'ready',
         date_from: dateFrom,
         date_to: dateTo,
+        event_id: eventId,
       }
     })
 

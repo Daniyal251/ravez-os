@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import { EVENT_STATUSES } from '../../utils/constants'
+import { EVENT_STATUSES, EVENT_TYPES } from '../../utils/constants'
 
 export default function EventModal({ event, onSave, onClose }) {
   const [form, setForm] = useState(event)
@@ -79,6 +79,35 @@ export default function EventModal({ event, onSave, onClose }) {
                 <option key={key} value={key}>{statusItem.label}</option>
               ))}
             </select>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-surface-500 mb-1.5">Тип</label>
+              <select value={form.event_type || 'standard'} onChange={e => setForm({ ...form, event_type: e.target.value })}>
+                {Object.entries(EVENT_TYPES).map(([key, item]) => (
+                  <option key={key} value={key}>{item.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-surface-500 mb-1.5">План гостей</label>
+              <input
+                type="number"
+                value={form.expected_guests || ''}
+                onChange={e => setForm({ ...form, expected_guests: Number(e.target.value || 0) })}
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-surface-500 mb-1.5">План бюджета (₽)</label>
+              <input
+                type="number"
+                value={form.budget_plan || ''}
+                onChange={e => setForm({ ...form, budget_plan: Number(e.target.value || 0) })}
+                placeholder="0"
+              />
+            </div>
           </div>
 
           <div>

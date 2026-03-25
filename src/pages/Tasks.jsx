@@ -5,8 +5,10 @@ import { Plus, Search, Filter, X, CheckSquare } from 'lucide-react'
 
 export default function Tasks() {
   const [tasks, setTasks] = useState([])
+  const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
+  const [eventFilter, setEventFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editTask, setEditTask] = useState(null)
@@ -15,19 +17,26 @@ export default function Tasks() {
 
   async function loadTasks() {
     setLoading(true)
-    const res = await api.get('tasks/list')
-    if (res?.tasks) setTasks(res.tasks)
+    const [tasksRes, eventsRes] = await Promise.all([
+      api.get('tasks/list'),
+      api.get('events/list'),
+    ])
+    if (tasksRes?.tasks) setTasks(tasksRes.tasks)
+    setEvents(eventsRes?.events || [])
     setLoading(false)
   }
 
   const filtered = tasks.filter(t => {
     if (filter !== 'all' && t.status !== filter) return false
+    if (eventFilter !== 'all' && Number(t.event_id) !== Number(eventFilter)) return false
     if (search && !t.title?.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
 
+  const eventById = Object.fromEntries(events.map(item => [Number(item.id), item]))
+
   function openNew() {
-    setEditTask({ title: '', description: '', status: 'new', deadline: '', assigned_to: '' })
+    setEditTask({ title: '', description: '', status: 'new', deadline: '', assigned_to: '', event_id: '' })
     setShowModal(true)
   }
 
@@ -78,6 +87,12 @@ export default function Tasks() {
             </FilterBtn>
           ))}
         </div>
+        <select value={eventFilter} onChange={e => setEventFilter(e.target.value)} className="sm:w-64">
+          <option value="all">Все мероприятия</option>
+          {events.map(eventItem => (
+            <option key={eventItem.id} value={eventItem.id}>{eventItem.title}</option>
+          ))}
+        </select>
       </div>
 
       {/* Task list */}
@@ -94,6 +109,7 @@ export default function Tasks() {
         <div className="card divide-y divide-surface-100">
           {filtered.map(task => {
             const st = TASK_STATUSES[task.status] || TASK_STATUSES.new
+            const eventItem = eventById[Number(task.event_id)]
             return (
               <div
                 key={task.id}
@@ -123,6 +139,11 @@ export default function Tasks() {
                       {task.description}
                     </p>
                   )}
+                  {eventItem && (
+                    <p className="text-[11px] text-brand-600 mt-1">
+                      Мероприятие: {eventItem.title}
+                    </p>
+                  )}
                 </div>
 
                 <span className={`badge ${st.color} shrink-0 hidden sm:inline-flex`}>
@@ -144,6 +165,7 @@ export default function Tasks() {
       {showModal && editTask && (
         <TaskModal
           task={editTask}
+          events={events}
           onSave={saveTask}
           onClose={() => { setShowModal(false); setEditTask(null) }}
         />
@@ -167,7 +189,7 @@ function FilterBtn({ active, onClick, children }) {
   )
 }
 
-function TaskModal({ task, onSave, onClose }) {
+function TaskModal({ task, events, onSave, onClose }) {
   const [form, setForm] = useState(task)
   const [saving, setSaving] = useState(false)
 
@@ -229,6 +251,18 @@ function TaskModal({ task, onSave, onClose }) {
                 onChange={e => setForm({ ...form, deadline: e.target.value })}
               />
             </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-surface-500 mb-1.5">Мероприятие</label>
+            <select
+              value={form.event_id || ''}
+              onChange={e => setForm({ ...form, event_id: e.target.value ? Number(e.target.value) : null })}
+            >
+              <option value="">— Без привязки —</option>
+              {events.map(eventItem => (
+                <option key={eventItem.id} value={eventItem.id}>{eventItem.title}</option>
+              ))}
+            </select>
           </div>
         </div>
 
